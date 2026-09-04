@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASC Aviron Masters — Programme d'Entraînement Phase 1 (Manosque 2026)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            },
+            zone1: '#10b981', // Vert Aérobie de Base (<75% FCmax)
+            zone2: '#f59e0b', // Ambre Seuil (80–86% FCmax)
+            zone3: '#ef4444', // Rouge Haute Intensité (88–95% FCmax)
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(51, 65, 85, 0.65);
+    }
+    .badge-z1 { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .badge-z2 { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-z3 { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .dark .badge-z1 { background-color: #064e3b; color: #6ee7b7; border-color: #047857; }
+    .dark .badge-z2 { background-color: #78350f; color: #fcd34d; border-color: #b45309; }
+    .dark .badge-z3 { background-color: #7f1d1d; color: #fca5a5; border-color: #b91c1c; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col justify-between">
+
+  <!-- En-tête / Barre de navigation -->
+  <header class="sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black text-xl shadow-md tracking-wider">
+          CASC
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            Phase 1 : En Route vers Manosque 2026
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Programme Hebdomadaire Masters &bull; 7 sept. – 6 déc. 2026</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button id="openDisclaimerBtnNav" class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition">
+          <svg class="w-4 h-4 mr-1.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Sécurité &amp; Licence
+        </button>
+
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 border border-sky-300 dark:border-sky-800">
+          Priorité B (Dress Rehearsal)
+        </span>
+
+        <button id="themeToggle" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition" title="Basculer le mode sombre">
+          <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-grow">
+
+    <!-- Centre de Contrôle & Paramétrage Collectif -->
+    <div class="glass-card rounded-2xl p-5 shadow-xs space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Sélecteur de Filière Athlète -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            Filière d'Expérience &amp; Niveau
+          </label>
+          <div class="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 w-full" role="group">
+            <button type="button" data-cohort="novice" class="cohort-btn flex-1 py-1.5 px-2 text-xs sm:text-sm font-semibold rounded-lg transition text-slate-700 dark:text-slate-300">
+              Débutant (&lt;1 an)
+            </button>
+            <button type="button" data-cohort="intermediate" class="cohort-btn flex-1 py-1.5 px-2 text-xs sm:text-sm font-semibold rounded-lg transition text-slate-700 dark:text-slate-300">
+              Interm. (1–3 ans)
+            </button>
+            <button type="button" data-cohort="veteran" class="cohort-btn flex-1 py-1.5 px-2 text-xs sm:text-sm font-semibold rounded-lg transition text-white bg-sky-600 shadow-xs">
+              Confirmé (&gt;3 ans)
+            </button>
+          </div>
+        </div>
+
+        <!-- Moteur de Fatigue & Sports Mixtes -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+            Moteur de Fatigue Multisport (Questionnaire)
+          </label>
+          <select id="crossTrainingSelect" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-2 px-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-sky-500 cursor-pointer">
+            <option value="none">Standard (Pas d'autre sport lourd cette semaine)</option>
+            <option value="avifit">Séances Avifit Actives (Quota Zone 3 déjà consommé)</option>
+            <option value="trail">Course à pied / Trail (Protection lombaire &amp; chocs)</option>
+            <option value="vtt">VTT / Cyclisme sur route (Fléchisseurs de hanche)</option>
+            <option value="teamsport">Sports Collectifs / Football (Couple uniquement)</option>
+          </select>
+        </div>
+
+        <!-- Fiche Repères Biologiques -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-center">
+          <div class="text-xs font-bold text-slate-700 dark:text-slate-200 flex justify-between">
+            <span id="cohortSummaryTitle">Repères Confirmés :</span>
+            <span id="cohortDragBadge" class="text-sky-600 dark:text-sky-400 font-bold">DF : H 122–125 | F 106–112</span>
+          </div>
+          <p id="cohortSummaryDesc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Plancher cadence : 19–21 CPM &bull; Zone 1 continue : 70–90 min &bull; Wolverine L1 &amp; Renforcement lourd
+          </p>
+        </div>
+      </div>
+
+      <!-- Alerte Dynamique Activités Croisées -->
+      <div id="crossTrainingBanner" class="hidden p-3 rounded-xl border text-xs sm:text-sm transition-all duration-300"></div>
+
+      <!-- Filtres de Blocs & Chronologie des 13 Semaines -->
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold uppercase text-slate-400">Filtrer par Bloc :</span>
+            <div class="inline-flex p-1 rounded-lg bg-slate-100 dark:bg-slate-800" id="blockButtonGroup">
+              <button type="button" data-block="all" class="block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300">
+                Toutes les Semaines
+              </button>
+              <button type="button" data-block="1" class="block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300">
+                Bloc 1 : Base Aérobie (S1–4)
+              </button>
+              <button type="button" data-block="2" class="block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300">
+                Bloc 2 : Seuil &amp; Test (S5–8)
+              </button>
+              <button type="button" data-block="3" class="block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-white bg-sky-600">
+                Bloc 3 : Supramaximal (S9–13)
+              </button>
+            </div>
+          </div>
+          <span class="text-xs font-semibold text-slate-500">
+            Sélection active : <span id="currentSelectionLabel" class="font-bold text-sky-600 dark:text-sky-400">Semaine 9</span>
+          </span>
+        </div>
+
+        <!-- Barre de Navigation des 13 Semaines (Jump to Week) -->
+        <div class="mt-3 flex items-center space-x-1.5 overflow-x-auto pb-1" id="weekSelectorBar">
+          <!-- Injecté par JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau de Bord de la Semaine Active -->
+    <div class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <div class="flex items-center space-x-2">
+            <h2 id="weekHeaderTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+              Semaine 9 : Introduction aux Allures Supramaximales
+            </h2>
+            <span id="weekTypeBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-z3">
+              Bloc 3 &bull; Charge
+            </span>
+          </div>
+          <p id="weekDateSpan" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            2 novembre 2026 – 8 novembre 2026 &bull; Volume cible : ~7,2 h (Confirmés)
+          </p>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="inline-flex items-center px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            Z1 : &lt;75% FCmax (Aisance)
+          </span>
+          <span class="inline-flex items-center px-2 py-1 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+            Z2 : 80–86% FCmax (Seuil)
+          </span>
+          <span class="inline-flex items-center px-2 py-1 rounded-md bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+            Z3 : 88–95% FCmax (Intense)
+          </span>
+        </div>
+      </div>
+
+      <!-- Grille des Séances Quotidiennes (Lundi à Dimanche) -->
+      <div id="daysGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
+        <!-- Rendu dynamique par renderActiveView() -->
+      </div>
+    </div>
+
+    <!-- Outils & Calculatrices Physiologiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+      
+      <!-- Calculateur d'Écarts 2k (Formule Physique Concept2) -->
+      <div class="lg:col-span-5 glass-card rounded-2xl p-5 shadow-xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <span>Calculateur d'Allures Cibles (Bloc 3)</span>
+            </h3>
+            <p class="text-xs text-slate-500">Calcule vos temps cibles &amp; vos Watts réels (P = 2,80 / v³)</p>
+          </div>
+          <span class="text-xs font-bold text-sky-600 dark:text-sky-400">Écarts 2k - Δ</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+              Temps de Référence 2k (mm:ss,s)
+            </label>
+            <div class="flex space-x-1">
+              <input type="number" id="calcMinutes" min="1" max="3" value="1" class="w-14 bg-slate-100 dark:bg-slate-800 text-center rounded-lg py-1.5 text-sm font-bold text-slate-900 dark:text-white">
+              <span class="text-slate-400 font-bold self-center">:</span>
+              <input type="number" id="calcSeconds" min="0" max="59.9" step="0.1" value="42.0" class="w-20 bg-slate-100 dark:bg-slate-800 text-center rounded-lg py-1.5 text-sm font-bold text-slate-900 dark:text-white">
+            </div>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2.5 border border-slate-200 dark:border-slate-700/50 flex flex-col justify-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Puissance 2k Estimée</span>
+            <div class="text-lg font-black text-sky-600 dark:text-sky-400">
+              <span id="calcBaseWatts">302</span> <span class="text-xs font-medium text-slate-500">Watts</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau des Allures Cibles selon la Filière -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-bold uppercase text-[10px]">
+                <th class="py-1.5 px-2">Format de Séance</th>
+                <th class="py-1.5 px-2">Écart Cible</th>
+                <th class="py-1.5 px-2">Allure au 500m</th>
+                <th class="py-1.5 px-2">Puissance</th>
+                <th class="py-1.5 px-2">Cadence (CPM)</th>
+              </tr>
+            </thead>
+            <tbody id="calculatorResultsBody" class="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+              <!-- Rempli dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-lg p-2.5 leading-relaxed">
+          <strong>Intérêt physiologique :</strong> Courir à ces allures développe la réserve de vitesse anaérobie (ASR) et recrute les fibres rapides de Type IIx sans provoquer d'acidose prolongée épuisante.
+        </div>
+      </div>
+
+      <!-- Graphique de Progression des Volumes d'Entraînement -->
+      <div class="lg:col-span-7 glass-card rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">
+              Progression des Volumes &amp; Semaines de Décharge
+            </h3>
+            <p class="text-xs text-slate-500">Cycle ondulatoire 3:1 &bull; Heures / Semaine sur les 13 Semaines</p>
+          </div>
+          <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+            Décharges : S4, S8, S13
+          </span>
+        </div>
+
+        <div class="relative h-60 w-full mt-3">
+          <canvas id="volumeChart"></canvas>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800 mt-2">
+          <span>&bull; S2 : Test Étape 1</span>
+          <span>&bull; S8 : Étalonnage Étape 2 (Soirée Club)</span>
+          <span>&bull; S13 : Manosque (Micro-Affûtage 48–72h)</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Option 3 Production Footer -->
+  <footer class="mt-12 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-xs text-slate-500 dark:text-slate-400 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-black flex items-center justify-center text-sm">
+            CASC
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 dark:text-slate-200 text-sm">CASC Rowing Club — Masters High-Performance Architecture</p>
+            <p class="text-[11px] text-slate-400">Phase 1 : Septembre 2026 à Décembre 2026 &bull; Objectif Régional Manosque Indoor</p>
+          </div>
+        </div>
+
+        <button id="openDisclaimerBtnFooter" class="inline-flex items-center px-3 py-1.5 rounded-lg font-bold text-xs bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition shadow-xs">
+          <svg class="w-4 h-4 mr-1.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Mentions Légales &amp; Avertissements Médicaux (Bilingual)
+        </button>
+      </div>
+
+      <!-- Option 3 Intellectual Property & Licensing Attribution -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-[11px] leading-relaxed">
+        <div>
+          <strong class="text-slate-700 dark:text-slate-300">Architecture Logicielle &amp; Code de l'Interface :</strong>
+          <p class="mt-0.5">
+            Publiée sous licence libre et open-source <span class="font-mono text-sky-600 dark:text-sky-400 font-semibold">MIT License</span>. Libre d'inspection, d'hébergement et d'adaptation technique pour la communauté aviron.
+          </p>
+        </div>
+        <div>
+          <strong class="text-slate-700 dark:text-slate-300">Contenu Périodisé, Méthodologie &amp; Volumes CASC :</strong>
+          <p class="mt-0.5">
+            &copy; 2026 CASC Aviron Club. <span class="font-semibold text-slate-700 dark:text-slate-300">Tous droits réservés (Proprietary Coaching IP).</span> Toute reproduction, intégration commerciale ou diffusion sans accord écrit du club est strictement interdite.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center text-[10px] text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800">
+        Non affilié commercialement à Concept2 Inc. &bull; Formule hydrodynamique $P = 2{,}80 \cdot v^{-3}$ appliquée à l'ergomètre statique.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Interactive : Mentions Légales & Avertissement Médical Bilingue -->
+  <div id="disclaimerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs hidden">
+    <div class="glass-card rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- En-tête Modal -->
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/80">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <h3 class="text-base font-extrabold text-slate-900 dark:text-white">
+            Avertissements Médicaux &amp; Licence &bull; Disclaimers &amp; Terms
+          </h3>
+        </div>
+        <button id="closeDisclaimerBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Corps Modal Défilant -->
+      <div class="p-6 overflow-y-auto space-y-6 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        
+        <!-- Section Français -->
+        <div class="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl p-4 space-y-2">
+          <div class="flex items-center space-x-2 text-amber-900 dark:text-amber-200 font-black uppercase text-xs tracking-wider">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span>[FR] Avertissement Médical et Sportif Obligatoire</span>
+          </div>
+          <p>
+            Les programmes d'entraînement périodisés, fractionnés supramaximaux ($2\text{k} - \Delta$), zones de fréquence cardiaque et calculs de puissance intégrés dans cette application s'adressent à des athlètes masters entraînés et reconnus médicalement aptes.
+          </p>
+          <p>
+            L'aviron à haute intensité et la musculation lourde génèrent des contraintes cardiorespiratoires et biomécaniques majeures. Chaque athlète doit obligatoirement être en possession d'un certificat médical de non-contre-indication à la pratique de l'aviron en compétition. En présence de symptômes anormaux (oppression thoracique, étourdissements, dyspnée aiguë ou douleurs costales/lombaires vives), cessez immédiatement la séance et consultez un professionnel de santé. Le CASC Aviron, son encadrement technique et les auteurs du code déclinent toute responsabilité légale ou médicale relative à l'exécution de ces entraînements.
+          </p>
+        </div>
+
+        <!-- Section Anglais -->
+        <div class="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 rounded-xl p-4 space-y-2">
+          <div class="flex items-center space-x-2 text-blue-900 dark:text-blue-200 font-black uppercase text-xs tracking-wider">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>[EN] Athletic &amp; Medical Physical Disclaimer</span>
+          </div>
+          <p>
+            The training schedules, split offsets, heart-rate zones, and physiological parameters in this application are designed exclusively for conditioned, medically cleared master athletes.
+          </p>
+          <p>
+            Rowing, static ergometer trials, supramaximal intervals ($2\text{k} - \Delta$), and heavy resistance lifting impose severe cardiovascular and musculoskeletal demands. Athletes must obtain qualified medical clearance before undertaking this program. Discontinue exercise immediately and consult a physician if you experience chest pain, dizziness, severe shortness of breath, or joint distress. CASC Rowing Club, coaches, and contributors assume no liability for injury, cardiac events, or overtraining resulting from the execution of workouts generated by this application.
+          </p>
+        </div>
+
+        <!-- Répartition de Propriété Intellectuelle (Option 3) -->
+        <div class="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3">
+          <h4 class="text-xs font-black uppercase text-slate-700 dark:text-slate-300">
+            Structure des Licences &bull; Intellectual Property Notice (Option 3)
+          </h4>
+          <div class="space-y-2 text-[11px]">
+            <p>
+              <strong>1. Code &amp; Interface Web (MIT License) :</strong> Le code source HTML/JS/CSS, les algorithmes de synchronisation et la formule de calcul mécanique Concept2 sont libres et distribués sous la licence MIT.
+            </p>
+            <p>
+              <strong>2. Méthodologie &amp; Contenu Périodisé CASC (Tous Droits Réservés) :</strong> L'agencement macrocyclique des 13 semaines, la grille des filières, les benchmarks diagnostiques et les règles de fatigue multisport constituent la propriété exclusive du <strong>CASC Rowing Club &copy; 2026</strong>. Toute réutilisation commerciale est strictement soumise à autorisation préalable.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bouton Fermeture Modal -->
+      <div class="px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex justify-end">
+        <button id="closeDisclaimerBtnBottom" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition">
+          J'ai compris / Acknowledge &amp; Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Script JavaScript : Données Complètes & Logique Réactive -->
+  <script>
+    // État Global de l'Application
+    const appState = {
+      cohort: 'veteran',        // 'novice' | 'intermediate' | 'veteran'
+      currentWeek: 9,           // 1 à 13
+      activeBlock: 3,           // 'all' | 1 | 2 | 3
+      crossTraining: 'none',    // 'none' | 'avifit' | 'trail' | 'vtt' | 'teamsport'
+      refSplitSeconds: 102.0    // Base 1:42.0
+    };
+
+    // Profils Physiologiques et Paramètres Matériel
+    const cohortProfiles = {
+      novice: {
+        title: 'Rameurs Débutants (<1 an)',
+        drag: 'DF : H 115 | F 100 (Levier ~2,5–3,5)',
+        desc: 'Cadence plancher : strictement 20–22 CPM &bull; Zone 1 continue max : 40–45 min &bull; Micro-intervalles 30s/30s',
+        hoursRange: '3,5 à 5,0 h/sem',
+        volMultiplier: 0.55,
+        offsets: { rep500: -1.0, rep750: -0.5, rep1000: 1.5, starts: -3.0 },
+        cadences: { rep500: '28–30', rep750: '26–28', rep1000: '26–28', starts: '32–34' }
+      },
+      intermediate: {
+        title: 'Rameurs Intermédiaires (1–3 ans)',
+        drag: 'DF : H 118–120 | F 103–105 (Levier ~3,0–3,8)',
+        desc: 'Cadence plancher : 19–21 CPM &bull; Zone 1 continue max : 50–65 min &bull; Pyramides & séries au seuil (6x500m, 3x1000m)',
+        hoursRange: '5,0 à 6,5 h/sem',
+        volMultiplier: 0.78,
+        offsets: { rep500: -1.5, rep750: -1.0, rep1000: 1.0, starts: -4.0 },
+        cadences: { rep500: '30–32', rep750: '28–30', rep1000: '28–30', starts: '34–36' }
+      },
+      veteran: {
+        title: 'Rameurs Confirmés / Vétérans (>3 ans)',
+        drag: 'DF : H 122–125 | F 106–112 (Levier ~3,5–4,2)',
+        desc: 'Cadence plancher : 19–21 CPM &bull; Zone 1 continue : 70–90 min &bull; Wolverine L1 (8x500m) & renforcement lourd (LIFTMOR)',
+        hoursRange: '6,5 à 8,5 h/sem',
+        volMultiplier: 1.00,
+        offsets: { rep500: -2.5, rep750: -1.5, rep1000: 0.5, starts: -5.0 },
+        cadences: { rep500: '30–34', rep750: '28–32', rep1000: '28–30', starts: '34–38+' }
+      }
+    };
+
+    // Métadonnées des 13 Semaines
+    const weeksMeta = [
+      { week: 1, block: 1, name: 'Reprise Technique & Calibrage du Drag', dates: '7 sept. – 13 sept. 2026', type: 'base', baseHours: 6.8 },
+      { week: 2, block: 1, name: 'Étape 1 : Diagnostic Initial du 2k', dates: '14 sept. – 20 sept. 2026', type: 'test', baseHours: 7.2 },
+      { week: 3, block: 1, name: 'Construction du Socle Foncier', dates: '21 sept. – 27 sept. 2026', type: 'base', baseHours: 7.8 },
+      { week: 4, block: 1, name: 'Décharge d\'Assimilation n°1', dates: '28 sept. – 4 oct. 2026', type: 'deload', baseHours: 5.0 },
+      { week: 5, block: 2, name: 'Introduction au Travail de Seuil (AT)', dates: '5 oct. – 11 oct. 2026', type: 'threshold', baseHours: 7.5 },
+      { week: 6, block: 2, name: 'Progression des Séries au Seuil', dates: '12 oct. – 18 oct. 2026', type: 'threshold', baseHours: 8.0 },
+      { week: 7, block: 2, name: 'Pic de Volume Aérobie', dates: '19 oct. – 25 oct. 2026', type: 'peak', baseHours: 8.5 },
+      { week: 8, block: 2, name: 'Étape 2 : Étalonnage Mi-Parcours & Décharge', dates: '26 oct. – 1 nov. 2026', type: 'test', baseHours: 5.4 },
+      { week: 9, block: 3, name: 'Introduction aux Allures Supramaximales', dates: '2 nov. – 8 nov. 2026', type: 'hiit', baseHours: 7.2 },
+      { week: 10, block: 3, name: 'Répétitions Supramaximales sur 750m', dates: '9 nov. – 15 nov. 2026', type: 'hiit', baseHours: 6.8 },
+      { week: 11, block: 3, name: 'Vitesse Spécifique & Allure de Course', dates: '16 nov. – 22 nov. 2026', type: 'hiit', baseHours: 6.5 },
+      { week: 12, block: 3, name: 'Départs, Vivacité & Consolidation', dates: '23 nov. – 29 nov. 2026', type: 'taper', baseHours: 5.5 },
+      { week: 13, block: 3, name: 'Semaine de Championnat (Manosque)', dates: '30 nov. – 6 déc. 2026', type: 'race', baseHours: 4.0 }
+    ];
+
+    // Générateur Détaillé des Séances du Lundi au Dimanche
+    function generateWeeklyPlan(cohort, weekNum, crossTraining) {
+      const isNovice = cohort === 'novice';
+      const isInterm = cohort === 'intermediate';
+      const isVet = cohort === 'veteran';
+
+      const dragStr = isNovice ? 'DF : H 115 / F 100' : isInterm ? 'DF : H 118–120 / F 103–105' : 'DF : H 122–125 / F 106–112';
+      const spmFloor = isNovice ? '20–22 CPM (Strict)' : '19–21 CPM';
+
+      let days = [
+        {
+          day: 'Lundi',
+          title: 'Récupération Post-Week-end & VRC',
+          category: 'Repos / Régénération',
+          zone: 'Repos',
+          badgeClass: 'badge-z1',
+          duration: 'Journée Complète',
+          warmup: 'Mesure de la Variabilité de Fréquence Cardiaque (VRC) au réveil en position allongée (60s).',
+          main: 'Repos passif obligatoire. Aucun coup de rame. Auto-massage au rouleau (mollets, quadriceps, fessiers) + 15 min de décompression lombaire douce.',
+          cooldown: 'Respiration ventrale en carré (4s inspiration, 4s blocage, 4s expiration, 4s blocage) x 5 min.',
+          spm: 'N/A',
+          hr: 'Fréquence de Repos',
+          drag: 'N/A'
+        },
+        {
+          day: 'Mardi',
+          title: isNovice ? 'Ergomètre : Placement & Coordination' : 'Sortie Autonome sur l\'Eau ou Ergo Solo',
+          category: 'Autonomie / Technique',
+          zone: 'Zone 1 Base',
+          badgeClass: 'badge-z1',
+          duration: isNovice ? '40 min' : isInterm ? '55 min' : '75 min',
+          warmup: '8 min d\'éducatifs inversés (bras seuls, corps et bras, demi-coulisse, coulisse complète) à 18 CPM.',
+          main: isNovice ? '2 x 18 min en endurance fondamentale (3 min de pause étirements). Plafonné à <75% FCmax. Focus sur la bascule du bassin sur l\'avant.' :
+                isInterm ? '2 x 25 min réguliers en skiff autonome ou ergo. Maintien de la longueur et suspension souple.' :
+                '3 x 20 min en endurance fondamentale (2:30 de pause). Courbe de force fluide, sans écraser le levier.',
+          cooldown: '5 min de retour au calme <60% FCmax + étirements doux des ischio-jambiers.',
+          spm: spmFloor,
+          hr: '<75% FCmax (Aisance respiratoire)',
+          drag: dragStr
+        },
+        {
+          day: 'Mercredi',
+          title: 'Séance Milieu de Semaine / PPG',
+          category: 'Intensité / Renforcement',
+          zone: weekNum >= 9 ? 'Zone 3 HIIT' : weekNum >= 5 ? 'Zone 2 Seuil' : 'Zone 1 / PPG',
+          badgeClass: weekNum >= 9 ? 'badge-z3' : weekNum >= 5 ? 'badge-z2' : 'badge-z1',
+          duration: isNovice ? '45 min' : isInterm ? '60 min' : '75 min',
+          warmup: '12 min d\'échauffement progressif + 3 x 15s de montées en puissance à la cadence cible.',
+          main: '',
+          cooldown: '8 min de ramage très souple à 18 CPM + mobilité thoracique.',
+          spm: '',
+          hr: '',
+          drag: dragStr
+        },
+        {
+          day: 'Jeudi',
+          title: 'Récupération Pré-Week-end',
+          category: 'Mobilité Active',
+          zone: 'Repos / Mobilité',
+          badgeClass: 'badge-z1',
+          duration: '30 min',
+          warmup: '5 min de mobilisation articulaire épaules et bassin.',
+          main: 'Régénération non traumatisante : 20 min de marche rapide à plat, vélo très facile (<65% FCmax) ou étirements profonds des psoas.',
+          cooldown: 'Exercices posturaux doux : dos de chat et renforcement des fixateurs d\'omoplates (3 x 10 répétitions).',
+          spm: 'N/A',
+          hr: '<65% FCmax',
+          drag: 'N/A'
+        },
+        {
+          day: 'Vendredi Soir',
+          title: 'Créneau Compétiteurs du Club',
+          category: 'Séance Encadrée Coach',
+          zone: (weekNum === 2 || weekNum === 8) ? 'Test Chronométré' : (weekNum >= 9 ? 'Zone 3 Allures' : 'Zone 2 Seuil'),
+          badgeClass: (weekNum === 2 || weekNum === 8 || weekNum >= 9) ? 'badge-z3' : 'badge-z2',
+          duration: isNovice ? '50 min' : '70 min',
+          warmup: 'Protocole d\'échauffement collectif standardisé (30 min) : échauffement progressif, éducatifs, 3x10 coups forts, 2 départs.',
+          main: '',
+          cooldown: '10 min de retour au calme à basse cadence + débriefing collectif du coach et hydratation.',
+          spm: '',
+          hr: '',
+          drag: dragStr
+        },
+        {
+          day: 'Samedi Matin',
+          title: 'Séance Flotte sur l\'Eau (Équipages)',
+          category: 'Bateaux Collectifs (4x/8+)',
+          zone: 'Zone 1 Foncier',
+          badgeClass: 'badge-z1',
+          duration: isNovice ? '60 min' : isInterm ? '75 min' : '90 min',
+          warmup: 'Préparation du matériel, vérification des réglages, 15 min d\'éducatifs en couple avec pauses aux positions clés.',
+          main: isNovice ? 'Sortie en quatre de couple ou huit mixte avec rameurs d\'expérience à la nage : 3 x 15 min réguliers. Travail de synchronisation de la pose des pelles.' :
+                isInterm ? 'Cohésion d\'équipage : 3 x 20 min en endurance fondamentale. Pelles à plat sur le retour, recherche de glisse maximale.' :
+                'Ligne d\'eau compétiteurs : 4 x 18 min en bateau long. Ratios réguliers, relance dynamique à l\'attaque sans secousse.',
+          cooldown: '10 min de rentrée au ponton en souplesse, rinçage du matériel et étirements collectifs.',
+          spm: '19–21 CPM',
+          hr: '<75% FCmax',
+          drag: 'Standard Bateau'
+        },
+        {
+          day: 'Dimanche Matin',
+          title: 'Endurance Longue Distance sur l\'Eau',
+          category: 'Grand Foncier / Mer & Rivière',
+          zone: weekNum === 13 ? 'JOUR DE COURSE' : 'Zone 1 Continue',
+          badgeClass: weekNum === 13 ? 'badge-z3' : 'badge-z1',
+          duration: weekNum === 13 ? 'Compétition' : (isNovice ? '65 min' : isInterm ? '80 min' : '95 min'),
+          warmup: '10 min d\'éveil musculaire sur le ponton + 10 min de mise en train progressive sur l\'eau.',
+          main: '',
+          cooldown: 'Rangement soigné du matériel, contrôle des portants et collation de récupération riche en glucides.',
+          spm: weekNum === 13 ? '30–34+ CPM' : '19–21 CPM',
+          hr: weekNum === 13 ? 'MAX COURSE' : '<75% FCmax',
+          drag: 'Bateau / Régate'
+        }
+      ];
+
+      // Personnalisation des Mercredis
+      if (weekNum === 13) {
+        days[2].title = 'Déblocage Pré-Compétition';
+        days[2].main = isNovice ? '2 x 10 min Z1 + 4 x 20s de départs à cadence de course (pause 1:30). Léger et précis.' :
+                       '2 x 15 min Z1 + 5 x 30s à cadence de course 2k (pause 2:00 souple). Vif, explosif, sans accumuler d\'acidose.';
+        days[2].spm = 'Pointes à 30–32 CPM';
+        days[2].hr = '<80% FCmax en pointe';
+      } else if (weekNum >= 9) {
+        if (weekNum === 9) {
+          days[2].title = 'Wolverine L1 : 500m Supramaximaux';
+          days[2].main = isNovice ? '6 x 500m (3:30 de pause souple) à l\'allure 2k - 1,0s. Cadence 28–30 CPM.' :
+                         isInterm ? '7 x 500m (3:30 de pause souple) à l\'allure 2k - 1,5s. Cadence 30–32 CPM.' :
+                         '8 x 500m (3:30 de pause souple) à l\'allure 2k - 2,5s. Cadence 30–34 CPM. Vrai travail de réserve de vitesse.';
+          days[2].spm = isNovice ? '28–30 CPM' : '30–34 CPM';
+          days[2].hr = '88–95% FCmax (Zone 3)';
+        } else if (weekNum === 10) {
+          days[2].title = 'Répétitions Supramaximales sur 750m';
+          days[2].main = isNovice ? '3 x 750m (3:30 de pause souple) à 2k - 0,5s. Cadence 26–28 CPM.' :
+                         isInterm ? '4 x 750m (3:30 de pause souple) à 2k - 1,0s. Cadence 28–30 CPM.' :
+                         '4 x 750m (3:30 de pause souple) à 2k - 1,5s. Cadence 28–32 CPM. Sollicitation du tamponnage intracellulaire.';
+          days[2].spm = '28–32 CPM';
+          days[2].hr = '88–95% FCmax (Zone 3)';
+        } else if (weekNum === 11) {
+          days[2].title = 'Répétiteurs 1000m Allure 2k';
+          days[2].main = isNovice ? '3 x 1000m (4:30 de pause) à l\'allure 2k + 2,0s. Cadence 26–28 CPM.' :
+                         isInterm ? '4 x 1000m (4:30 de pause) à l\'allure 2k + 1,0s. Cadence 28–30 CPM.' :
+                         '4 x 1000m (4:30 de pause) à l\'allure exacte 2k +/- 0,0s. Cadence 28–30 CPM. Ancrage psychologique du rythme.';
+          days[2].spm = '28–30 CPM';
+          days[2].hr = '90–95% FCmax (Zone 3)';
+        } else {
+          days[2].title = 'Vivacité & Départs sur 250m';
+          days[2].main = isNovice ? '5 x 250m (2:00 de pause souple) à 2k - 3,0s. Cadence 32–34 CPM.' :
+                         '6 x 250m (2:00 de pause souple) à 2k - 5,0s. Cadence 34–38+ CPM. Vitesse de démarrage du volant.';
+          days[2].spm = '34–38 CPM';
+          days[2].hr = 'Alactique / Zone 3';
+        }
+      } else if (weekNum >= 5) {
+        days[2].title = 'Développement du Seuil Aérobie (AT)';
+        days[2].main = isNovice ? '3 x 8 min au seuil (pause 3 min) à 22–24 CPM. RPE 5–6/10.' :
+                       isInterm ? '3 x 10 min au seuil (pause 3 min) à 24–26 CPM. Pression constante.' :
+                       '2 x 15 min ou 3 x 10 min à 80–86% FCmax, cadence 24–26 CPM. Négative split sur les 3 dernières minutes.';
+        days[2].spm = '22–26 CPM';
+        days[2].hr = '80–86% FCmax (Zone 2)';
+      } else {
+        days[2].title = isVet ? 'Musculation Lourde Adaptée (LIFTMOR)' : 'Renforcement Postural Fondamental';
+        days[2].main = isNovice ? 'Circuit gainage anti-rotation, squats au poids du corps, soulevés de terre légers aux haltères (3 x 12 répétitions propres).' :
+                       isInterm ? 'Soulevé de terre trap-bar (3x8 à 70% 1RM), tirage banc haltère, développé militaire, mobilité des hanches.' :
+                       'Protocole LIFTMOR : Trap-bar deadlift (4x4 à 82% 1RM), squat avant (3x5 à 80%), tirage banc couché (4x5), maintien de la densité minérale osseuse.';
+        days[2].spm = 'Salle de Musculation';
+        days[2].hr = '<75% FCmax';
+      }
+
+      // Personnalisation des Vendredis Soirs
+      if (weekNum === 2) {
+        days[4].title = 'ÉTAPE 1 : Test Diagnostic Initial du 2k';
+        days[4].main = isVet ? 'Test standardisé 30 minutes Cadence 20 (30r20). Puissance maximale régulière à 20 CPM strict. Permet d\'extrapoler les Watts 2k (Watts 2k = Watts 30r20 / 0,725).' :
+                              'Test progressif par paliers 4 x 1000m (3 min de pause) à 22 CPM. Palier 1 facile (RPE 3), Palier 2 régulier (RPE 5), Palier 3 appuyé (RPE 7), Palier 4 maximal régulier. La moyenne des paliers 3 et 4 donne votre référence 2k.';
+        days[4].spm = isVet ? '20 CPM Strict' : '22 CPM Strict';
+        days[4].hr = 'Progressif vers Maximal';
+      } else if (weekNum === 8) {
+        days[4].title = 'ÉTAPE 2 : Étalonnage Officiel Mi-Parcours';
+        days[4].main = isVet ? 'Contre-la-montre officiel 2 000m en conditions réelles de compétition. Cadence libre (viser 30–34 CPM). Verrouille le temps de référence pour le Bloc 3.' :
+                              'Test calibré 2 x 1000m (6 min de pause active). Répétition 1 sur l\'allure cible S2 ; Répétition 2 ouverte pour négative split. La moyenne établit votre split de travail.';
+        days[4].spm = '30–34 CPM';
+        days[4].hr = 'Effort Maximal Compétition';
+      } else if (weekNum === 13) {
+        days[4].title = 'Déblocage de Veille de Régate';
+        days[4].main = '20 min au total : 10 min d\'échauffement souple + 3 x 10 coups à l\'allure et cadence de course (2 min de repos) + 2 répétitions des 5 premiers coups de départ. Vérification finale du levier.';
+        days[4].spm = '30–34 CPM';
+        days[4].hr = '<80% FCmax';
+      } else if (weekNum >= 9) {
+        days[4].title = 'Répétition Générale de Course';
+        days[4].main = isNovice ? 'Micro-intervalles : 12 x (1 min effort à cadence de course / 1 min souple). Gestuelle propre et fluide.' :
+                       isInterm ? 'Pyramide de course : 1000m (repos 3 min) + 750m (repos 2:30) + 500m (repos 2 min) au split 2k.' :
+                       'Séance Seiler 4 x 8 min (2 min de repos) à 88–92% FCmax ou simulation de 2 x 1500m.';
+        days[4].spm = '26–30 CPM';
+        days[4].hr = '88–92% FCmax (Zone 3)';
+      } else {
+        days[4].title = 'Séance Seuil & Régularité Encadrée';
+        days[4].main = isNovice ? '4 x 5 min avec montées de cadence (20, 22, 22, 24 CPM) et 2 min de repos. Alignement horizontal de la chaîne de force.' :
+                       '3 x 2000m aérobie au seuil (3 min de repos) à 22–24 CPM. Maîtrise des chronos et synchronisation d\'équipage.';
+        days[4].spm = '20–24 CPM';
+        days[4].hr = '80–86% FCmax (Zone 2)';
+      }
+
+      // Personnalisation des Dimanches
+      if (weekNum === 13) {
+        days[6].title = 'CHAMPIONNAT RÉGIONAL INDOOR (MANOSQUE)';
+        days[6].main = 'JOUR DE COURSE : Épreuve officielle 2 000m sur ergomètre Concept2 statique. Échauffement collectif 30 min. Application du plan de course travaillé. Répétition générale réussie !';
+        days[6].spm = '30–34+ CPM';
+        days[6].hr = '100% de la Puissance Réalisable';
+      } else {
+        days[6].title = 'Sortie Longue Distance en Flotte';
+        days[6].main = isNovice ? '10 à 12 km continus sur l\'eau. Accent mis sur l\'immersion nette de la pale et l\'expiration pendant la phase motrice.' :
+                       isInterm ? '12 à 15 km réguliers. Maintien de l\'accélération des jambes et du gainage du buste sur l\'ensemble du parcours.' :
+                       '14 à 18 km d\'endurance fondamentale continue. Haute économie de geste, développement du réseau capillaire musculaire.';
+        days[6].spm = '19–21 CPM';
+        days[6].hr = '<75% FCmax';
+      }
+
+      // Application des Règles de Fatigue Croisée
+      if (crossTraining === 'avifit') {
+        days[2].title = 'Récupération Active en Zone 1 (Quota Avifit Consommé)';
+        days[2].category = 'Adaptation Multisport';
+        days[2].zone = 'Zone 1 Base';
+        days[2].badgeClass = 'badge-z1';
+        days[2].main = 'ATTENTION COACHING : Votre quota hebdomadaire d\'intensité haute et d\'effort lactique est déjà absorbé par votre participation à l\'Avifit. Cette séance d\'aviron est automatiquement convertie en 35 à 45 min d\'endurance aérobie très souple (<75% FCmax) ou en technique de skiff. Tout travail au seuil ou sprint est rigoureusement proscrit pour éviter la fatigue excessive des côtes et des épaules.';
+        days[2].hr = '<75% FCmax (Strict)';
+      } else if (crossTraining === 'trail') {
+        days[1].main += ' [CONSIGNE TRAIL / CÀP : Plafonnez l\'ergomètre à 40 min en continu. Gardez le buste bien droit et vertical à l\'attaque pour soulager les lombaires fatiguées par les chocs en descente.]';
+      } else if (crossTraining === 'vtt') {
+        days[1].main += ' [CONSIGNE CYCLISME / VTT : Baissez vos cale-pieds d\'un trou sur l\'ergomètre pour ouvrir l\'angle de hanche et étirez le psoas 5 minutes avant d\'attaquer.]';
+        days[5].main += ' [CONSIGNE CYCLISME : Réglez la planchette de cale-pieds légèrement plus basse dans le bateau.]';
+      } else if (crossTraining === 'teamsport') {
+        days[5].main += ' [CONSIGNE SPORT CO : Sortie impérativement assignée en Couple (deux avirons). Évitez la pointe pour préserver le bassin et les articulations sacro-iliaques des torsions asymétriques.]';
+      }
+
+      return days;
+    }
+
+    // Initialisation et Gestionnaires d'Événements
+    document.addEventListener('DOMContentLoaded', () => {
+      initWeekTimeline();
+      initChart();
+      updateCohortUI();
+      updateCalculator();
+      renderActiveView();
+      initModalHandlers();
+
+      // Bascule Thème Sombre / Clair
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // Boutons de Filière
+      document.querySelectorAll('.cohort-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const cohort = e.target.getAttribute('data-cohort');
+          setCohort(cohort);
+        });
+      });
+
+      // Sélecteur de Sport Complémentaire
+      document.getElementById('crossTrainingSelect').addEventListener('change', (e) => {
+        appState.crossTraining = e.target.value;
+        renderActiveView();
+        updateCrossTrainingBanner();
+      });
+
+      // Boutons Filtre de Bloc
+      document.querySelectorAll('.block-filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const blk = e.target.getAttribute('data-block');
+          setBlockFilter(blk);
+        });
+      });
+
+      // Champs Calculateur
+      document.getElementById('calcMinutes').addEventListener('input', updateCalculator);
+      document.getElementById('calcSeconds').addEventListener('input', updateCalculator);
+    });
+
+    // Gestion du Modal Bilingue des Mentions Légales
+    function initModalHandlers() {
+      const modal = document.getElementById('disclaimerModal');
+      const openBtns = [document.getElementById('openDisclaimerBtnNav'), document.getElementById('openDisclaimerBtnFooter')];
+      const closeBtns = [document.getElementById('closeDisclaimerBtn'), document.getElementById('closeDisclaimerBtnBottom')];
+
+      openBtns.forEach(btn => {
+        if (btn) btn.addEventListener('click', () => modal.classList.remove('hidden'));
+      });
+
+      closeBtns.forEach(btn => {
+        if (btn) btn.addEventListener('click', () => modal.classList.add('hidden'));
+      });
+
+      // Fermeture par clic sur le backdrop
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+      });
+
+      // Fermeture via touche Echap
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          modal.classList.add('hidden');
+        }
+      });
+    }
+
+    // Modification de la Filière Rameur
+    function setCohort(cohort) {
+      appState.cohort = cohort;
+      document.querySelectorAll('.cohort-btn').forEach(btn => {
+        if (btn.getAttribute('data-cohort') === cohort) {
+          btn.className = 'cohort-btn flex-1 py-1.5 px-2 text-xs sm:text-sm font-semibold rounded-lg transition text-white bg-sky-600 shadow-xs';
+        } else {
+          btn.className = 'cohort-btn flex-1 py-1.5 px-2 text-xs sm:text-sm font-semibold rounded-lg transition text-slate-700 dark:text-slate-300';
+        }
+      });
+
+      updateCohortUI();
+      updateCalculator();
+      updateChartDataset();
+      renderActiveView();
+    }
+
+    function updateCohortUI() {
+      const p = cohortProfiles[appState.cohort];
+      document.getElementById('cohortSummaryTitle').innerText = `${p.title} :`;
+      document.getElementById('cohortDragBadge').innerText = p.drag;
+      document.getElementById('cohortSummaryDesc').innerHTML = `${p.desc} &bull; Cible : ${p.hoursRange}`;
+    }
+
+    // Filtrage des Blocs
+    function setBlockFilter(blk) {
+      appState.activeBlock = blk === 'all' ? 'all' : parseInt(blk);
+
+      document.querySelectorAll('.block-filter-btn').forEach(btn => {
+        const bVal = btn.getAttribute('data-block');
+        if (bVal == blk) {
+          btn.className = 'block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-white bg-sky-600';
+        } else {
+          btn.className = 'block-filter-btn px-2.5 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300';
+        }
+      });
+
+      document.querySelectorAll('.week-nav-btn').forEach(wBtn => {
+        const wBlock = parseInt(wBtn.getAttribute('data-block'));
+        if (blk === 'all' || wBlock === parseInt(blk)) {
+          wBtn.classList.remove('hidden');
+        } else {
+          wBtn.classList.add('hidden');
+        }
+      });
+    }
+
+    // Saut Direct vers une Semaine (Résolution du Conflit de Filtre)
+    function jumpToWeek(weekNum) {
+      appState.currentWeek = weekNum;
+      const targetMeta = weeksMeta[weekNum - 1];
+
+      // Si le bloc actif masque la semaine cible, basculer sur le bloc parent
+      if (appState.activeBlock !== 'all' && appState.activeBlock !== targetMeta.block) {
+        setBlockFilter(targetMeta.block);
+      }
+
+      document.querySelectorAll('.week-nav-btn').forEach(wBtn => {
+        const w = parseInt(wBtn.getAttribute('data-week'));
+        if (w === weekNum) {
+          wBtn.className = 'week-nav-btn flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-xs border border-sky-500';
+        } else {
+          wBtn.className = 'week-nav-btn flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700';
+        }
+      });
+
+      if (window.progressionChart) {
+        window.progressionChart.setActiveElements([{ datasetIndex: 0, index: weekNum - 1 }]);
+        window.progressionChart.update();
+      }
+
+      renderActiveView();
+    }
+
+    // Construction de la Barre Chronologique
+    function initWeekTimeline() {
+      const container = document.getElementById('weekSelectorBar');
+      container.innerHTML = '';
+      weeksMeta.forEach(m => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('data-week', m.week);
+        btn.setAttribute('data-block', m.block);
+        btn.className = m.week === appState.currentWeek
+          ? 'week-nav-btn flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-xs border border-sky-500'
+          : 'week-nav-btn flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700';
+
+        let badgeTag = m.type === 'deload' ? ' (Décharge)' : m.type === 'test' ? ' (Test)' : m.type === 'race' ? ' (Course)' : '';
+        btn.innerText = `S${m.week}${badgeTag}`;
+        btn.addEventListener('click', () => jumpToWeek(m.week));
+        container.appendChild(btn);
+      });
+    }
+
+    // Affichage des Cartes de la Semaine Active
+    function renderActiveView() {
+      const wMeta = weeksMeta[appState.currentWeek - 1];
+      const p = cohortProfiles[appState.cohort];
+      const weekHours = (wMeta.baseHours * p.volMultiplier).toFixed(1);
+
+      document.getElementById('weekHeaderTitle').innerText = `Semaine ${wMeta.week} : ${wMeta.name}`;
+      document.getElementById('currentSelectionLabel').innerText = `Semaine ${wMeta.week} (${p.title})`;
+      document.getElementById('weekDateSpan').innerText = `${wMeta.dates} • Volume estimé : ~${weekHours} h/semaine`;
+
+      const badge = document.getElementById('weekTypeBadge');
+      let typeLabel = wMeta.type === 'deload' ? 'DÉCHARGE' : wMeta.type === 'hiit' ? 'HAUTE INTENSITÉ' : wMeta.type === 'race' ? 'COMPÉTITION' : wMeta.type === 'test' ? 'TEST' : 'DÉVELOPPEMENT';
+      badge.innerText = `Bloc ${wMeta.block} • ${typeLabel}`;
+      
+      if (wMeta.type === 'deload') {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold badge-z1';
+      } else if (wMeta.type === 'hiit' || wMeta.type === 'race' || wMeta.type === 'test') {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold badge-z3';
+      } else {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold badge-z2';
+      }
+
+      const days = generateWeeklyPlan(appState.cohort, appState.currentWeek, appState.crossTraining);
+      const grid = document.getElementById('daysGrid');
+      grid.innerHTML = '';
+
+      days.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-xl p-3.5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow border border-slate-200 dark:border-slate-800';
+
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div>
+                <span class="text-[11px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">${d.day}</span>
+                <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug">${d.title}</h4>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.badgeClass}">${d.zone}</span>
+            </div>
+
+            <div class="text-[11px] space-y-1.5 text-slate-600 dark:text-slate-300">
+              <p><strong class="text-slate-900 dark:text-slate-200">Échauffement :</strong> ${d.warmup}</p>
+              <p><strong class="text-slate-900 dark:text-slate-200">Corps de séance :</strong> ${d.main}</p>
+              <p><strong class="text-slate-900 dark:text-slate-200">Retour au calme :</strong> ${d.cooldown}</p>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] grid grid-cols-2 gap-1 text-slate-500 dark:text-slate-400">
+            <div><span class="font-semibold text-slate-700 dark:text-slate-300">Cadence :</span> ${d.spm}</div>
+            <div><span class="font-semibold text-slate-700 dark:text-slate-300">Plafond FC :</span> ${d.hr}</div>
+            <div class="col-span-2"><span class="font-semibold text-slate-700 dark:text-slate-300">Réglage :</span> ${d.drag}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Bannière des Directives Multisport
+    function updateCrossTrainingBanner() {
+      const banner = document.getElementById('crossTrainingBanner');
+      const ct = appState.crossTraining;
+
+      if (ct === 'none') {
+        banner.className = 'hidden';
+        banner.innerHTML = '';
+        return;
+      }
+
+      banner.className = 'p-3 rounded-xl border text-xs sm:text-sm block transition-all duration-300 ';
+      if (ct === 'avifit') {
+        banner.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-900', 'dark:bg-amber-950/60', 'dark:border-amber-800', 'dark:text-amber-200');
+        banner.innerHTML = '<strong>⚡ Séances Avifit Actives :</strong> Votre quota hebdomadaire de Zone 3 à dominante lactique est déjà consommé par le cours en musique. La séance du mercredi est automatiquement basculée en récupération aérobie Zone 1 (<75% FCmax) pour éviter la surcharge autonome et protéger la cage thoracique.';
+      } else if (ct === 'trail') {
+        banner.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-900', 'dark:bg-blue-950/60', 'dark:border-blue-800', 'dark:text-blue-200');
+        banner.innerHTML = '<strong>🏔 Pratique Trail / Course à pied Détectée :</strong> Fatigue musculaire excentrique et compression axiale de la colonne. Les fractions continues sur ergomètre sont limitées à 40 minutes, avec un rappel strict de maintien du buste droit.';
+      } else if (ct === 'vtt') {
+        banner.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-900', 'dark:bg-emerald-950/60', 'dark:border-emerald-800', 'dark:text-emerald-200');
+        banner.innerHTML = '<strong>🚴 Pratique Cyclisme / VTT Active :</strong> Fléchisseurs de hanche (psoas) raccourcis et enroulement dorsal. Abaissez les cale-pieds de 1 à 2 crans pour ouvrir l\'angle fémoro-bassin et pratiquez un étirement du psoas avant de ramer.';
+      } else if (ct === 'teamsport') {
+        banner.classList.add('bg-purple-50', 'border-purple-200', 'text-purple-900', 'dark:bg-purple-950/60', 'dark:border-purple-800', 'dark:text-purple-200');
+        banner.innerHTML = '<strong>⚽ Sports Collectifs / Football :</strong> Forte torsion du bassin. Les sorties sur l\'eau sont strictement orientées vers la pratique en Couple (deux avirons) pour éviter le cisaillement asymétrique de la pointe.';
+      }
+    }
+
+    // Calculateur Dynamique d'Allures
+    function updateCalculator() {
+      const mins = parseFloat(document.getElementById('calcMinutes').value) || 1;
+      const secs = parseFloat(document.getElementById('calcSeconds').value) || 0;
+      const totalSecs = (mins * 60) + secs;
+      appState.refSplitSeconds = totalSecs;
+
+      // Formule Concept2 : Watts = 2.80 / (v^3) avec v = 500 / S => Watts = 350,000,000 / (S^3)
+      const baseWatts = Math.round(350000000 / Math.pow(totalSecs, 3));
+      document.getElementById('calcBaseWatts').innerText = isNaN(baseWatts) ? '---' : baseWatts;
+
+      const p = cohortProfiles[appState.cohort];
+      const offsets = p.offsets;
+      const cadences = p.cadences;
+
+      const rows = [
+        { name: '8 x 500m Wolverine L1', offset: offsets.rep500, spm: cadences.rep500 },
+        { name: '4 x 750m Supramaximal', offset: offsets.rep750, spm: cadences.rep750 },
+        { name: '4 x 1000m Allure 2k', offset: offsets.rep1000, spm: cadences.rep1000 },
+        { name: '6 x 250m Départs & Pointes', offset: offsets.starts, spm: cadences.starts }
+      ];
+
+      const tbody = document.getElementById('calculatorResultsBody');
+      tbody.innerHTML = '';
+
+      rows.forEach(r => {
+        const targetSecs = totalSecs + r.offset;
+        const targetMin = Math.floor(targetSecs / 60);
+        const targetRemSec = (targetSecs % 60).toFixed(1);
+        const formattedSplit = `${targetMin}:${targetRemSec < 10 ? '0' : ''}${targetRemSec}`;
+        const repWatts = Math.round(350000000 / Math.pow(targetSecs, 3));
+        const sign = r.offset < 0 ? `${r.offset.toFixed(1)}s` : `+${r.offset.toFixed(1)}s`;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/60 transition';
+        tr.innerHTML = `
+          <td class="py-2 px-2 font-bold text-slate-800 dark:text-slate-200">${r.name}</td>
+          <td class="py-2 px-2 text-sky-600 dark:text-sky-400 font-bold">${sign}</td>
+          <td class="py-2 px-2 font-black text-slate-900 dark:text-white">${formattedSplit}/500m</td>
+          <td class="py-2 px-2 text-slate-600 dark:text-slate-300 font-mono">${repWatts} W</td>
+          <td class="py-2 px-2 text-slate-500">${r.spm} CPM</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Graphique Chart.js de Volume Hebdomadaire
+    function initChart() {
+      const ctx = document.getElementById('volumeChart').getContext('2d');
+      const labels = weeksMeta.map(m => `S${m.week}`);
+      const p = cohortProfiles[appState.cohort];
+      const dataHours = weeksMeta.map(m => parseFloat((m.baseHours * p.volMultiplier).toFixed(1)));
+
+      const bgColors = weeksMeta.map(m => {
+        if (m.type === 'deload') return 'rgba(16, 185, 129, 0.75)'; // émeraude
+        if (m.type === 'race' || m.type === 'test') return 'rgba(239, 68, 68, 0.8)'; // rose / rouge
+        if (m.type === 'hiit') return 'rgba(245, 158, 11, 0.75)'; // ambre
+        return 'rgba(2, 132, 199, 0.65)'; // bleu ciel
+      });
+
+      window.progressionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `Volume ${p.title} (Heures/Semaine)`,
+            data: dataHours,
+            backgroundColor: bgColors,
+            borderColor: bgColors.map(c => c.replace('0.75', '1').replace('0.8', '1').replace('0.65', '1')),
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const idx = items[0].dataIndex;
+                  return `Semaine ${idx + 1} : ${weeksMeta[idx].name}`;
+                },
+                label: (item) => `Volume cible : ${item.formattedValue} Heures`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 10,
+              title: { display: true, text: 'Heures d\'Entraînement / Semaine', font: { size: 10 } },
+              grid: { color: 'rgba(148, 163, 184, 0.15)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          onClick: (evt, elements) => {
+            if (elements && elements.length > 0) {
+              const clickedWeek = elements[0].index + 1;
+              jumpToWeek(clickedWeek);
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartDataset() {
+      if (!window.progressionChart) return;
+      const p = cohortProfiles[appState.cohort];
+      const dataHours = weeksMeta.map(m => parseFloat((m.baseHours * p.volMultiplier).toFixed(1)));
+      window.progressionChart.data.datasets[0].data = dataHours;
+      window.progressionChart.data.datasets[0].label = `Volume ${p.title} (Heures/Semaine)`;
+      window.progressionChart.update();
+    }
+  </script>
+</body>
+</html>
